@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CTS Launch — First 24 Hours</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series-1: #2a78d6;
+    --track: #f0efec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series-1: #3987e5;
+      --track: #262624;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.45;
+    padding: 32px 20px 64px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header h1 { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; }
+  header p.sub { color: var(--text-secondary); margin-top: 6px; font-size: 14px; }
+  section { margin-top: 40px; }
+  h2 { font-size: 17px; font-weight: 650; margin-bottom: 4px; }
+  .section-note { color: var(--text-muted); font-size: 13px; margin-bottom: 14px; }
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .card + .card { margin-top: 14px; }
+
+  /* Stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .tile .label { font-size: 13px; color: var(--text-secondary); }
+  .tile .value { font-size: 30px; font-weight: 650; margin-top: 4px; letter-spacing: -0.01em; }
+  .tile .detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* HTML bar chart */
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .chart-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+  .bars { display: grid; grid-template-columns: max-content 1fr max-content; row-gap: 9px; column-gap: 10px; align-items: center; }
+  .bar-label { font-size: 13px; color: var(--text-secondary); text-align: right; white-space: nowrap; }
+  .bar-label .handle { color: var(--text-muted); font-size: 12px; }
+  .bar-track { position: relative; height: 20px; border-left: 1px solid var(--baseline); }
+  .bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--series-1);
+    border-radius: 0 4px 4px 0;   /* rounded data end, square at baseline */
+    min-width: 2px;
+  }
+  .bar-fill.other { background: var(--baseline); }
+  .bar-row-hit { display: contents; }
+  .bar-row-hit:hover .bar-fill { filter: brightness(1.12); }
+  .bar-value { font-size: 13px; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar-value .share { color: var(--text-muted); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 12.5px;
+       border-bottom: 1px solid var(--grid); padding: 6px 10px 6px 0; }
+  td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--grid); }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.muted { color: var(--text-muted); }
+  .rowname { color: var(--text-primary); }
+  .rowname .handle { color: var(--text-muted); font-size: 12px; }
+  .table-scroll { overflow-x: auto; }
+
+  /* Notes */
+  ol.notes { padding-left: 22px; font-size: 14px; color: var(--text-secondary); }
+  ol.notes li { margin-bottom: 8px; }
+  ol.notes b { color: var(--text-primary); font-weight: 600; }
+
+  footer { margin-top: 48px; color: var(--text-muted); font-size: 12.5px; border-top: 1px solid var(--grid); padding-top: 14px; }
+
+  /* Tooltip */
+  #tip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 11px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    color: var(--text-secondary); max-width: 260px;
+  }
+  #tip b { color: var(--text-primary); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>CTS Launch — First 24 Hours</h1>
+  <p class="sub">Center for Technology and Statecraft (techstatecraft.org) · launched Aug 19, 2026 · metrics collected Aug 20, ~1:30 PM EDT</p>
+</header>
+
+<section>
+  <h2>Website</h2>
+  <p class="section-note">Cloudflare, last 24 h. Tracking began with the proxy flip ~11 AM EDT on Aug 19, so the first launch hours are not fully captured.</p>
+  <div class="tiles">
+    <div class="tile"><div class="label">Unique visitors</div><div class="value">3,340</div></div>
+    <div class="tile"><div class="label">Total requests</div><div class="value">86,060</div></div>
+    <div class="tile"><div class="label">Peak visitors / hour</div><div class="value">495</div><div class="detail">Aug 19, ~1 PM EDT</div></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="chart-title">Requests by country</div>
+    <div class="chart-sub">Share of 86,060 total requests</div>
+    <div class="bars" id="chart-countries"></div>
+  </div>
+</section>
+
+<section>
+  <h2>X</h2>
+  <p class="section-note">Launch posts by team members and the CTS page.</p>
+  <div class="card">
+    <div class="chart-title">Views per launch post</div>
+    <div class="chart-sub">68.7K combined views across six posts</div>
+    <div class="bars" id="chart-x"></div>
+  </div>
+  <div class="card">
+    <div class="chart-title">Engagement per post</div>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Post</th><th class="num">Views</th><th class="num">Reposts</th><th class="num">Likes</th><th class="num">Comments</th><th class="num">Bookmarks</th></tr></thead>
+      <tbody>
+        <tr><td class="rowname">Saif <span class="handle">@KhanSaifM</span></td><td class="num">51,800</td><td class="num">95</td><td class="num">354</td><td class="num">28</td><td class="num">107</td></tr>
+        <tr><td class="rowname">Konstantin <span class="handle">@KonstantinPilz</span></td><td class="num">8,100</td><td class="num">11</td><td class="num">138</td><td class="num">9</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">Amelia <span class="handle">@amelia__michael</span></td><td class="num">5,700</td><td class="num">7</td><td class="num">99</td><td class="num">5</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">Mary Clare <span class="handle">@mary_clare_m</span></td><td class="num">1,600</td><td class="num">4</td><td class="num">45</td><td class="num">1</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">Nicholas <span class="handle">@nchlsbrwn</span></td><td class="num">743</td><td class="num">5</td><td class="num">24</td><td class="num">1</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">CTS page <span class="handle">@techstatecraft</span></td><td class="num">734</td><td class="num">3</td><td class="num">14</td><td class="num">0</td><td class="num">1</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>LinkedIn</h2>
+  <p class="section-note">Impressions are only visible for posts Konstantin controls; reactions are public and comparable across all posts. No LinkedIn launch post found for Nicholas.</p>
+  <div class="card">
+    <div class="chart-title">Reactions per launch post</div>
+    <div class="chart-sub">Public reaction counts</div>
+    <div class="bars" id="chart-li"></div>
+  </div>
+  <div class="card">
+    <div class="chart-title">Full LinkedIn numbers</div>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Post</th><th class="num">Impressions</th><th class="num">Reactions</th><th class="num">Comments</th><th class="num">Reposts</th></tr></thead>
+      <tbody>
+        <tr><td class="rowname">Saif</td><td class="num muted">n/a (his account)</td><td class="num">233</td><td class="num">15</td><td class="num">15</td></tr>
+        <tr><td class="rowname">Mary Clare</td><td class="num muted">n/a</td><td class="num">79</td><td class="num">16</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">Konstantin</td><td class="num">3,462</td><td class="num">72</td><td class="num">10</td><td class="num">2</td></tr>
+        <tr><td class="rowname">Amelia</td><td class="num muted">n/a</td><td class="num">40</td><td class="num">3</td><td class="num muted">—</td></tr>
+        <tr><td class="rowname">CTS page</td><td class="num">944</td><td class="num">27</td><td class="num">0</td><td class="num">1</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Accounts &amp; notes</h2>
+  <div class="card">
+    <ol class="notes">
+      <li><b>CTS followers:</b> X 305 · LinkedIn page 199 (page visitors +66.7% over the last 7 days).</li>
+      <li><b>Launch redirect works:</b> Saif's X thread and LinkedIn post both link techstatecraft.org/launch.</li>
+      <li><b>Notable amplification on X:</b> Jonas Freund (GovAI), Dean W. Ball, Thomas Woodside.</li>
+      <li><b>Naming slip:</b> the CTS page posts on both platforms say "Technology and Statecraft" in the text. Tweets can't be edited; the LinkedIn post can be.</li>
+      <li><b>Analytics gaps:</b> GA4 numbers exist but the property belongs to And-Now; Plausible needs plausible.io whitelisted in the ad blocker.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  Temporary page for internal sharing — not indexed. Compiled by Konstantin's Claude, Aug 20, 2026.
+</footer>
+
+</div>
+<div id="tip"></div>
+
+<script>
+const fmt = n => n.toLocaleString("en-US");
+
+function renderBars(elId, rows, opts) {
+  const el = document.getElementById(elId);
+  const max = Math.max(...rows.map(r => r.value));
+  const total = opts.total ?? rows.reduce((s, r) => s + r.value, 0);
+  el.innerHTML = rows.map(r => {
+    const pct = (r.value / max) * 100;
+    const share = (r.value / total) * 100;
+    const shareTxt = opts.shares ? ` <span class="share">(${share >= 10 ? share.toFixed(0) : share.toFixed(1)}%)</span>` : "";
+    return `<div class="bar-row-hit" data-name="${r.name}" data-value="${r.value}" data-share="${share.toFixed(1)}" data-extra="${r.extra ?? ""}">
+      <div class="bar-label">${r.label ?? r.name}${r.handle ? ` <span class="handle">${r.handle}</span>` : ""}</div>
+      <div class="bar-track"><div class="bar-fill${r.other ? " other" : ""}" style="width:${pct}%"></div></div>
+      <div class="bar-value">${fmt(r.value)}${shareTxt}</div>
+    </div>`;
+  }).join("");
+}
+
+renderBars("chart-countries", [
+  { name: "United States", value: 65960 },
+  { name: "United Kingdom", value: 4711 },
+  { name: "Canada", value: 2510 },
+  { name: "Germany", value: 1565 },
+  { name: "Netherlands", value: 1386 },
+  { name: "All others", value: 9928, other: true },
+], { total: 86060, shares: true });
+
+renderBars("chart-x", [
+  { name: "Saif", handle: "@KhanSaifM", value: 51800, extra: "95 reposts · 354 likes" },
+  { name: "Konstantin", handle: "@KonstantinPilz", value: 8100, extra: "11 reposts · 138 likes" },
+  { name: "Amelia", handle: "@amelia__michael", value: 5700, extra: "7 reposts · 99 likes" },
+  { name: "Mary Clare", handle: "@mary_clare_m", value: 1600, extra: "4 reposts · 45 likes" },
+  { name: "Nicholas", handle: "@nchlsbrwn", value: 743, extra: "5 reposts · 24 likes" },
+  { name: "CTS page", handle: "@techstatecraft", value: 734, extra: "3 reposts · 14 likes" },
+], { shares: false });
+
+renderBars("chart-li", [
+  { name: "Saif", value: 233, extra: "15 comments · 15 reposts" },
+  { name: "Mary Clare", value: 79, extra: "16 comments" },
+  { name: "Konstantin", value: 72, extra: "3,462 impressions · 10 comments" },
+  { name: "Amelia", value: 40, extra: "3 comments" },
+  { name: "CTS page", value: 27, extra: "944 impressions" },
+], { shares: false });
+
+// Tooltip
+const tip = document.getElementById("tip");
+document.querySelectorAll(".bar-row-hit").forEach(row => {
+  row.querySelectorAll("*").forEach(cell => {
+    cell.addEventListener("mousemove", e => {
+      const extra = row.dataset.extra;
+      tip.innerHTML = `<b>${row.dataset.name}</b>: ${fmt(+row.dataset.value)}` +
+        (row.closest("#chart-countries") ? ` requests (${row.dataset.share}%)` : "") +
+        (extra ? `<br>${extra}` : "");
+      tip.style.display = "block";
+      const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+      tip.style.left = x + "px";
+      tip.style.top = (e.clientY + 14) + "px";
+    });
+    cell.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+  });
+});
+</script>
+</body>
+</html>
