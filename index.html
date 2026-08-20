@@ -162,9 +162,13 @@
     <div class="bars" id="chart-devices"></div>
   </div>
   <div class="card">
-    <div class="chart-title">Cloudflare request-level view</div>
-    <div class="chart-sub">Last 24 h, from the proxy flip ~11 AM EDT Aug 19 · includes bots and ad-blocked visitors: 3,340 uniques · 86,060 requests · peak 495 visitors/hour</div>
+    <div class="chart-title">Visitors by country</div>
+    <div class="chart-sub">Share of 772 unique visitors (Plausible)</div>
     <div class="bars" id="chart-countries"></div>
+  </div>
+  <div class="card">
+    <div class="chart-title">Cloudflare request-level view</div>
+    <div class="chart-sub" style="margin-bottom:0;">Last 24 h, from the proxy flip ~11 AM EDT Aug 19 · includes bots and ad-blocked visitors: 3,340 uniques · 86,060 requests · peak 495 visitors/hour · 77% of requests from the U.S.</div>
   </div>
 </section>
 
@@ -303,13 +307,13 @@ renderBars("chart-devices", [
 ], { total: 772, shares: true });
 
 renderBars("chart-countries", [
-  { name: "United States", value: 65960 },
-  { name: "United Kingdom", value: 4711 },
-  { name: "Canada", value: 2510 },
-  { name: "Germany", value: 1565 },
-  { name: "Netherlands", value: 1386 },
-  { name: "All others", value: 9928, other: true },
-], { total: 86060, shares: true });
+  { name: "United States", value: 566 },
+  { name: "United Kingdom", value: 60 },
+  { name: "Canada", value: 25 },
+  { name: "Germany", value: 24 },
+  { name: "Netherlands", value: 9 },
+  { name: "All others", value: 88, other: true, extra: "incl. Switzerland 7, Italy 5, Ukraine 5" },
+], { total: 772, shares: true });
 
 renderBars("chart-x", [
   { name: "Saif", handle: "@KhanSaifM", value: 51800, extra: "95 reposts · 354 likes" },
@@ -335,7 +339,7 @@ document.querySelectorAll(".bar-row-hit").forEach(row => {
     cell.addEventListener("mousemove", e => {
       const extra = row.dataset.extra;
       tip.innerHTML = `<b>${row.dataset.name}</b>: ${fmt(+row.dataset.value)}` +
-        (row.closest("#chart-countries") ? ` requests (${row.dataset.share}%)` : "") +
+        (row.closest("#chart-countries") ? ` visitors (${row.dataset.share}%)` : "") +
         (extra ? `<br>${extra}` : "");
       tip.style.display = "block";
       const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
